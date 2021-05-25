@@ -8,39 +8,17 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM, Activation, BatchNormalization
 from keras.callbacks import ModelCheckpoint
 from properties import properties
+import utils
+import config as cfg
 
 
 def run() -> None:
-    all_notes = load_songs()
+    all_notes = utils.load_songs(cfg.config["midi_songs_path"])
+    utils.serialize_object(all_notes,cfg.config["midi_songs_serialized_path"])
     sequences_in, sequences_out = prepare_sequences(all_notes)
     network_in, network_out, pitch_amount = prepare_input_output(sequences_in, sequences_out)
     model = create_network(network_in, pitch_amount)
     train(model, network_in, network_out)
-
-
-def load_songs() -> List[List[str]]:
-    all_file_notes = list()
-
-    for file in glob.glob("midi_songs/*.mid"):
-        print(f"Loading file {file}", end=" ")
-
-        midi = converter.parse(file)
-        midi_partitioned_by_instrument = instrument.partitionByInstrument(midi)
-        file_notes = midi_partitioned_by_instrument.parts[0].recurse()
-
-        notes = list()
-
-        for element in file_notes:
-            if isinstance(element, Note):
-                notes.append(str(element.pitch))
-                pass
-            elif isinstance(element, chord.Chord):
-                notes.append('.'.join([str(note.pitch) for note in element.notes]))
-
-        all_file_notes.append(notes)
-
-        print(f"finished {len(notes)}")
-    return all_file_notes
 
 
 def prepare_sequences(all_notes: List[List[str]]):
