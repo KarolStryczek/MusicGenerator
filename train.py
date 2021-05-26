@@ -7,7 +7,6 @@ from keras.utils import np_utils
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM, Activation, BatchNormalization
 from keras.callbacks import ModelCheckpoint
-from properties import properties
 import utils
 import config as cfg
 
@@ -22,7 +21,7 @@ def run() -> None:
 
 
 def prepare_sequences(all_notes: List[List[str]]):
-    sequence_length = properties['sequence_length']
+    sequence_length = cfg.properties['sequence_length']
     sequences = list()
     sequences_out = list()
 
@@ -46,7 +45,7 @@ def prepare_input_output(sequences_in, sequences_out):
     network_in = [[notes_map[note] for note in seq_in] for seq_in in sequences_in]
     network_out = [notes_map[note] for note in sequences_out]
 
-    network_in = np.reshape(network_in, (n_patterns, properties['sequence_length'], 1))
+    network_in = np.reshape(network_in, (n_patterns, cfg.properties['sequence_length'], 1))
 
     network_in = network_in / float(pitch_amount)
 
